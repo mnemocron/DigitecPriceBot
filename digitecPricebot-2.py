@@ -128,7 +128,7 @@ def writeToFile():
 		if ( product.artnr in file ) :
 			filename = file
 	if ( len(filename) < 2 ) :								# file inexistent in outdir
-		filename = (opts.outdir + "/" + product.artnr + "-" + product.name.split(" (")[0] + ".csv").replace("//", "/")
+		filename = (opts.outdir + "/" + product.artnr + "-" + product.name.replace("/", "").split(" (")[0] + ".csv").replace("//", "/")
 
 		with open(filename, 'w+') as csvfile:				# open in write mode + create if inexistent
 			csvfile.write("URL\t" + product.url.replace("\n", "") + "\n")		# write header information
