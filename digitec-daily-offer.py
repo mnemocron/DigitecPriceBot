@@ -42,7 +42,7 @@ try:
 		print ("error: cannot open the provided url")
 		exit()
 
-	offer_list = parsed_html.body.find("article", attrs={"class", "daily-offer"})
+	offer_list = parsed_html.body.find("article", attrs={"class", "daily-offer-new"})
 	offer = offer_list.find("h5", attrs={"class", "product-name"}).text
 	offer = offer.replace("\r", "").replace("\n", " ").replace(" ", "", 1)
 	
