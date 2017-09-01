@@ -46,7 +46,7 @@ try:
 	offer = offer_list.find("h5", attrs={"class", "product-name"}).text
 	offer = offer.replace("\r", "").replace("\n", " ").replace(" ", "", 1)
 	
-	url = offer_list.find("a", attrs={"class", "overlay"})
+	url = offer_list.find("a", attrs={"class", "product-overlay"})
 	href = url["href"]
 
 	u_raw_price = offer_list.find("div", attrs={"class", "product-price"}).text
