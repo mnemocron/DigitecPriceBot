@@ -68,7 +68,7 @@ try:
 	s_price = price_str_raw[:dex].replace("\n", "")		# cut off only the number part
 
 	message = "Today's deal of the day:\n" + offer + "\n" + s_price + " CHF\nhttps://digitec.ch" + href
-	message = message.replace(unichr(228), "a").replace(unichr(246), "o").replace(unichr(252),"u").replace("\"", "\\\"").replace("'", "\'")
+	message = message.encode("utf-8")
 
 	# IMPORTANT !
 	# $ telegram-send
