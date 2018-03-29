@@ -4,6 +4,7 @@
 # 2017-01-17	fixed unichr ä ö ü
 # 2017-01-18	fixed inch descriptors " and '
 # 2017-06-12	changed message text to English
+# 2018-03-29 	removed telegram, changed the URL to the frontpage
 
 try:
 	import urllib2
@@ -15,22 +16,17 @@ except:
 	print ("error: library missing")
 	exit()
 
-if ( len(sys.argv) < 2 ):
-	print ( "usage:")
-	print ("\tdigitec-daily-alert [telegram name]")
-	exit()
-
 try:
 	# the digitec website wants some request headers,
 	# otherwise, it will answer with a '403 Forbidden'
 	# https://stackoverflow.com/questions/13303449/urllib2-httperror-http-error-403-forbidden#13303773
-	url = "https://digitec.ch/en/liveshopping"
+	url = "https://digitec.ch/en/"
 	hdr = {	'Host': 'www.digitec.ch',
 			'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0',
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Language': 'en-US,en;q=0.5',
 			'DNT': '1',
-			'Referer': 'https://www.digitec.ch/de/LiveShopping',
+			'Referer': 'https://www.digitec.ch/de/',
 			'Connection': 'keep-alive',
 			'Cache-Control': 'max-age=0'}
 
@@ -41,8 +37,9 @@ try:
 	except:
 		print ("error: cannot open the provided url")
 		exit()
-
-	offer_list = parsed_html.body.find("article", attrs={"class", "daily-offer-new"})
+	
+	offer_list = parsed_html.body.find("article", attrs={"class", "daily-offer-new", "product"})
+	
 	offer = offer_list.find("h5", attrs={"class", "product-name"}).text
 	offer = offer.replace("\r", "").replace("\n", " ").replace(" ", "", 1)
 	
@@ -68,14 +65,10 @@ try:
 	s_price = price_str_raw[:dex].replace("\n", "")		# cut off only the number part
 
 	message = "Today's deal of the day:\n" + offer + "\n" + s_price + " CHF\nhttps://digitec.ch" + href
-	message = message.encode("utf-8")
-
-	# IMPORTANT !
-	# $ telegram-send
-	# is a custom script, 
-	# you can modify this script to redirect the message part to whatever chanel you seem fit
-	for i in range(len(sys.argv)-1) :
-		os.system("telegram-send " + sys.argv[i+1] + " \"" + message + "\"" )
+	message = message.replace('"', '\\"').encode('utf-8')
+	sys.stdout.write(message)
+#	print "sending"
+#	os.system("telegram-bot -u mnemocron -t " + "asdf")
 
 # enables abortion of the program by CTRL + C
 except KeyboardInterrupt:
