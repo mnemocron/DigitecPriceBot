@@ -43,22 +43,11 @@ try:
 	offer = offer_list.find("h5", attrs={"class", "product-name"}).text
 	offer = offer.replace("\r", "").replace("\n", " ").replace(" ", "", 1)
 	
-	url = offer_list.find("a", attrs={"class", "product-overlay"})
-	href = url["href"]
-
-        # the digitec website wants some request headers,
-        # otherwise, it will answer with a '403 Forbidden'
-        # https://stackoverflow.com/questions/13303449/urllib2-httperror-http-error-403-forbidden#13303773
-        url = "https://digitec.ch/en/liveshopping"
-        hdr = { 'Host': 'www.digitec.ch',
-                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0',
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Language': 'en-US,en;q=0.5',
-                        'DNT': '1',
-                        'Referer': 'https://www.digitec.ch/de/LiveShopping',
-                        'Connection': 'keep-alive',
-                        'Cache-Control': 'max-age=0'}
-
+	# url = offer_list.find("a", attrs={"class", "product-overlay"})
+	# href = url["href"]
+	
+        # Get the product URL from the LiveShopping page:
+	url = "https://digitec.ch/en/liveshopping"
         try:
                 request = urllib2.Request(url, headers=hdr)
                 response = urllib2.urlopen(request).read()
