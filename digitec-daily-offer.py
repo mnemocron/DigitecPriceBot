@@ -46,6 +46,31 @@ try:
 	url = offer_list.find("a", attrs={"class", "product-overlay"})
 	href = url["href"]
 
+        # the digitec website wants some request headers,
+        # otherwise, it will answer with a '403 Forbidden'
+        # https://stackoverflow.com/questions/13303449/urllib2-httperror-http-error-403-forbidden#13303773
+        url = "https://digitec.ch/en/liveshopping"
+        hdr = { 'Host': 'www.digitec.ch',
+                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'DNT': '1',
+                        'Referer': 'https://www.digitec.ch/de/LiveShopping',
+                        'Connection': 'keep-alive',
+                        'Cache-Control': 'max-age=0'}
+
+        try:
+                request = urllib2.Request(url, headers=hdr)
+                response = urllib2.urlopen(request).read()
+                parsed_html = BeautifulSoup(response, "lxml")
+        except:
+                print ("error: cannot open the provided url")
+                exit()
+
+        offer_list = parsed_html.body.find("article", attrs={"class", "daily-offer-new"})
+        url = offer_list.find("a", attrs={"class", "product-overlay"})
+	href = url["href"]
+
 	u_raw_price = offer_list.find("div", attrs={"class", "product-price"}).text
 	# possibilities:
 	# CHF 333.–statt vorher 399.–3
@@ -64,7 +89,8 @@ try:
 	dex = price_str_raw.find(".") + 3		# or 3 ?
 	s_price = price_str_raw[:dex].replace("\n", "")		# cut off only the number part
 
-	message = "Today's deal of the day:\n" + offer + "\n" + s_price + " CHF\nhttps://digitec.ch" + href
+	#message = "Today's deal of the day:\n" + offer + "\n" + s_price + " CHF\nhttps://digitec.ch" + href
+	message = offer + "\n" + s_price + " CHF\nhttps://digitec.ch" + href
 	message = message.replace('"', '\\"').encode('utf-8')
 	sys.stdout.write(message)
 #	print "sending"
