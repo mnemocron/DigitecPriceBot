@@ -68,7 +68,7 @@ try:
 
 	# look for the first product URL containing the keyword "#ratings"
 	href = parsed_html.body.select('a[href*=#rating]')[0].get('href')
-	offer_url = 'https://digitec.ch' + str(href).split('#')[0].replace('/ratings', '')
+	offer_url = str(href).split('#')[0].replace('/ratings', '')
 
 	u_raw_price = offer_list.find('div', attrs={'class', 'product-price'}).text
 	# possibilities:
