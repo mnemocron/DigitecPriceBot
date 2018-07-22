@@ -1,11 +1,16 @@
-# Price Bot
+# Digitec Price Bot
 
-This is a tiny pricecrawler that can be run once a day on a server for example.
-The links of the input file are working for products of the two online shops [Digitec] and [Galaxus].
+This is a tiny pricecrawler for two online shops [Digitec] and [Galaxus].
+The script can be run periodically to track the price fluctuations of certain products.
 
 > digitec and galaxus are online shops from the swiss company [Digitec Galaxus AG]
 
-## Requirements
+You can subscribe to the [@digitecdaily](https://t.me/digitecdaily) channel on Telegram which posts the 
+digitec offer of the day each morning.
+
+---
+
+### Requirements
 - Python 2.7
 - HTML-parser BeautifulSoup (bs4)
 
@@ -13,7 +18,34 @@ The links of the input file are working for products of the two online shops [Di
 sudo pip install bs4
 ```
 
-## Input
+---
+
+## Daily Offer
+
+The [`digitec-daily-offer.py`](digitec-daily-offer.py) file is grabs the most recent deal of the day 
+from the digitec website and prints the product details, price and URL to stdout.
+This output can be forwarded to email or a Telegram-bot.
+
+### Usage
+
+Using [mnemocron/telegram-bot](https://github.com/mnemocron/telegram-bot)
+```bash
+telegram-bot -u digitecdaily -t "`/home/simon/workspace/digitec-alert/digitec-daily-offer.py`"
+```
+
+**Cronjob**
+
+```bash
+0 3 * * * telegram-bot -u digitecdaily -t "`/home/simon/workspace/digitec-alert/digitec-daily-offer.py`" --disable-notification > /dev/null 2>&1
+```
+
+Sends a silenced message to the username "digitecdaily" at 3 am.
+
+---
+
+## Pricebot 2.0
+
+### Input
 The script can take both an input file or a url as an argument.
 From the input file, only the lines containing the word 'digitec' or 'galaxus' will be used to look up a price.
 
@@ -22,9 +54,8 @@ digitecPricebot-2 -o [output directory] -i [input file]
 digitecPricebot-2 -o [output directory] -u [url]
 ```
 
-## Output
-The script outputs one `.csv` file for each product specified. The name of the file consists of the article number and a part of the name. Take a [Samsung SSD](https://www.digitec.ch/de/s1/product/samsung-850-evo-basic-500gb-25-ssd-3481917?tagIds=76) for example.
-This would result in the file name:
+### Output
+The script outputs one `.csv` file for each product specified. The name of the file consists of the article number and a part of the name. For example, this [Samsung SSD](https://www.digitec.ch/de/s1/product/samsung-850-evo-basic-500gb-25-ssd-3481917?tagIds=76) would result in the file name:
 
 ```
 3481917-Samsung 850 EVO Basic.csv
@@ -36,23 +67,24 @@ In most cases the bot is used to collect long term changes of the price. Thus, i
 If however, the last upodate in the file was made today, the script will not add another line with the same date.
 In this case you can force an update using `-t` or `--ignore-time`.
 
-## Running the Bot
-### Examples
+### Running the Bot
+#### Examples
 
 testing the script
 ```bash
 digitecPricebot-2 -o ./ -u https://www.digitec.ch/de/s1/product/samsung-850-evo-basic-500gb-25-ssd-3481917?tagIds=76
 ```
 
-cronjob every morning at 0:55am using an input file
+**Cronjob**
+
 ```bash
 55 0 * * * digitecPricebot-2 -o /var/www/html/digitec/ -i /home/user/Downloads/digitec_url.txt > /dev/null 2>&1
 ```
 
-A variety of products currently observed by my own bot is accessible on [simonmartin.ch](http://simonmartin.ch/digitec)
+cronjob every morning at 0:55am using an input file
 
-## Graphs
-The generated files are `TAB`-separated values and can easily be imported into a table calculation program to create fancygraphs.
+### Graphs
+The generated files are `TAB`-separated values and can easily be imported into a table calculation program to create fancy graphs.
 
 ## License
 
