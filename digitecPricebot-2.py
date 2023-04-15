@@ -37,10 +37,11 @@ try:
 	import optparse 				# argument parser
 	import os 						# files, directories
 	import datetime 				# timestamp
-	import urllib2 					# requesting webpages
+	import urllib.request 					# requesting webpages
 	from bs4 import BeautifulSoup 	# parsing html
-except Exception, ex:
-	print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] Error: " + str(ex))
+	import re
+except:
+	print("[" + bcolors.FAIL + "-" + bcolors.ENDC + "] Error: " + str(sys.exc_info()))
 	exit()
 
 # ===== ARGUMENTS =====
@@ -88,29 +89,24 @@ def getDigitecPrice(url):
 				'Connection': 'keep-alive',
 				'Cache-Control': 'max-age=0'}
 		try:
-			request = urllib2.Request(url, headers=hdr)
-			response = urllib2.urlopen(request).read()
+			request = urllib.request.Request(url, headers=hdr)
+			response = urllib.request.urlopen(request).read()
 			parsed_html = BeautifulSoup(response, "lxml")
-		except Exception, ex:
+		except Exception(ex):
 			print("[" + bcolors.WARNING + "*" + bcolors.ENDC + "] Warning: Could not open url " + url)
 
-		p_artnr = parsed_html.body.find("div", attrs={"class", "product-article-number"}).text.split(" ")[1]
-		p_brand = parsed_html.body.find("h1", attrs={"class", "product-name"}).text.replace("\n", "", 1).replace("\n", " ", 1).replace("\n", "")
-		# possibilities for p_price:
-		# CHF 333.–statt vorher 399.–3
-		# CHF 24.90
-		# CHF 48.–UVP 54.–1
+		p_artnr = re.findall(r"\d+$", url)[0]
+
+		# find the last occurrence of "/"
+		last_slash_index = url.rfind("/")
+		# extract the substring after the last "/"
+		p_brand = url[last_slash_index + 1:len(url)-len(p_artnr)-1]
 
 		# https://unicode-table.com/de/search/?q=%E2%80%93
 		# unicode: – / en dash / u+2013 / &#8211 / E2 80 93
-		p_price = parsed_html.body.find("div", attrs={"class", "product-price"}).text.replace("\n", "")
-		if ( len(p_price) > 3 ) :		# it happens that products don't have price tag
-			p_price = p_price.split("CHF")[1].replace(" ", "").replace(unichr(8211), "00")
-		else:
-			p_price = "0.00"
-		# 174.00MSRP291.001 <- cut away two chars after first occurrence of '.'
-		p_price = p_price[0:(p_price.find(".")+3)]
-		# print (p_artnr + "-" + p_brand.split("(")[0] + " : " + p_price)
+		p_price_raw = parsed_html.body.find("strong").text
+		p_price = re.sub(r"\D*$", "", p_price_raw)
+
 		product.url = url
 		product.artnr = p_artnr
 		product.name = p_brand
@@ -145,7 +141,8 @@ def writeToFile():
 			while ( csvfile.read(1) != b"\n" ) :		# Until EOL is found...
 				csvfile.seek(-2, 1)						# jump back the read byte plus one more.
 			lastline = csvfile.readline()
-			if ( str(today) in lastline ) :
+			print(today)
+			if ( today.encode() in lastline ) :
 				updatedToday = True
 
 		# only append to file, if the file hasn't been updated today, or the user requested to ignore the date
