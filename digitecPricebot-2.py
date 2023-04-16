@@ -81,7 +81,7 @@ def getDigitecPrice(url):
 		# otherwise, it will answer with a '403 Forbidden'
 		# https://stackoverflow.com/questions/13303449/urllib2-httperror-http-error-403-forbidden#13303773
 		hdr = {	'Host': 'www.digitec.ch',
-				'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0',
+				'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
 				'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 				'Accept-Language': 'en-US,en;q=0.5',
 				'DNT': '1',
@@ -102,10 +102,7 @@ def getDigitecPrice(url):
 		# extract the substring after the last "/"
 		p_brand = url[last_slash_index + 1:len(url)-len(p_artnr)-1]
 
-		# https://unicode-table.com/de/search/?q=%E2%80%93
-		# unicode: – / en dash / u+2013 / &#8211 / E2 80 93
-		p_price_raw = parsed_html.body.find("strong").text
-		p_price = re.sub(r"\D*$", "", p_price_raw)
+		p_price = parsed_html.head.find("meta", property="product:price:amount")["content"]
 
 		product.url = url
 		product.artnr = p_artnr
